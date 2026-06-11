@@ -16,18 +16,6 @@ export const createEvent = async (req, res) => {
         message: "All fields Required",
       });
     }
-    if (!/^[a-zA-Z0-9\s.,!?' "()_@#&+:|\-]+$/.test(title)) {
-      return res.status(400).json({
-        success: false,
-        message: "Enter valid title",
-      });
-    }
-    if (!/^[a-zA-Z0-9\s.,!?' "()_@#&+:|\-]+$/.test(summary)) {
-      return res.status(400).json({
-        success: false,
-        message: "Enter valid summary",
-      });
-    }
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
       return res.status(400).json({
         success: false,

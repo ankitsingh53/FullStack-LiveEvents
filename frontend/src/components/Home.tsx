@@ -11,8 +11,11 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 interface Event {
   id: string;
-  title: string,
-  summary: string
+  title: string;
+  summary: string;
+  date: string;
+  start_time: string;
+  end_time: string;
 }
 interface ContextData {
   eventData: Event[] | null;
@@ -26,7 +29,6 @@ interface ContextData {
   filterData: Event[];
   setErr: React.Dispatch<React.SetStateAction<string>>;
 }
-// const API_KEY: string = import.meta.env.VITE_API_KEY;
 export const NameContext = createContext<ContextData | null>(null);
 const Home = () => {
   const [eventData, setEventData] = useState<Event[]>([]);
@@ -43,7 +45,7 @@ const Home = () => {
   const fetchEvent = async (): Promise<void> => {
     try {
       const result = await fetch(
-        'api/getevents',
+        '/api/getevents',
         {
           method: "GET",
           headers: {
@@ -68,9 +70,7 @@ const Home = () => {
     }
   };
   useEffect(() => {
-    
    fetchEvent();
-  
   }, []);
   const filterData: Event[] = eventData.filter((item) =>
     item.title.toLowerCase().includes(debounceSearch.trim().toLowerCase()),

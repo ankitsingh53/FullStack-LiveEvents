@@ -17,16 +17,16 @@ export const updateEvent = async (req, res) => {
         message: "All fields Required",
       });
     }
-    if (!/^[a-zA-Z0-9\s.,!?' "()_@#&+:|\-]+$/.test(title.trim())) {
+    if (!title.trim()) {
       return res.status(400).json({
         success: false,
-        message: "Enter valid title",
+        message: "Title is required",
       });
     }
-    if (!/^[a-zA-Z0-9\s.,!?' "()_@#&+:|\-]+$/.test(summary.trim())) {
+    if (!summary.trim()) {
       return res.status(400).json({
         success: false,
-        message: "Enter valid summary",
+        message: "Summary is required",
       });
     }
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date.trim())) {

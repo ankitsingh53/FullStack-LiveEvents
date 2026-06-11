@@ -13,8 +13,6 @@ interface ItemData {
   title: string;
   summary: string
 }
-// type GetSpecific = (pageNumber: number) => void;
-// const API_KEY: string = import.meta.env.VITE_API_KEY;
 const Product = () => {
   const context = useContext(NameContext);
   const [currentpage, SetCurrentPage] = useState(1);

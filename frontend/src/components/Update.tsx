@@ -8,34 +8,18 @@ import z from "zod";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 interface FormType {
-  name: string;
+  title: string;
   summary: string;
   date: string;
   start_time: string;
   end_time: string;
 }
 interface Errors {
-  name?: string;
+  title?: string;
   summary?: string;
   date?: string;
   start_time?: string;
   end_time?: string;
-}
-interface EventItem {
-  id: string;
-  name: {
-    text: string;
-  };
-  description: {
-    text: string;
-  };
-  start: {
-    local: string;
-  };
-  end: {
-    local: string;
-  };
-  summary: string;
 }
 const schema = z
   .object({
@@ -49,43 +33,51 @@ const schema = z
     message: "End time must be after start time",
     path: ["end_time"],
   });
-const API_KEY: string = import.meta.env.VITE_API_KEY;
 const Update = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
   const [err, setErr] = useState<string>("");
   const [errors, setErrors] = useState<Errors>({});
   const [useLibrary, setUseLibrary] = useState<boolean>(false);
   const [formData, setFormData] = useState<FormType>({
-    name: "",
+    title: "",
     summary: "",
     date: "",
     start_time: "",
     end_time: "",
   });
+  console.log(formData)
+  const { id }= useParams();
   const context = useContext(NameContext);
   if (!context) {
     return;
   }
   const { fetchEvent, filterData } = context;
-  const currentData = (filterData as EventItem[]).find(
-    (item: { id: string }) => {
-      return item.id === id;
+  useEffect(() => {
+    console.log("useeffect ran")
+    console.log(filterData)
+    console.log(id)
+    if(filterData.length ===0){
+      console.log("filterdata empty calling fetchevents")
+      fetchEvent();
+      return
+    };
+    const currentData = filterData.find(
+    (item) => {
+      return String(item.id) === id;
     },
   );
-  useEffect(() => {
     if (!currentData) return;
-    const startLocal = currentData?.start?.local;
-    const endLocal = currentData?.end?.local;
+    const changedate = currentData.date;
+    // const endLocal = currentData?.end?.local;
     const newFormData = {
-      name: currentData?.name?.text || "",
-      summary: currentData?.summary || "",
-      date: startLocal?.split("T")[0] || "",
-      start_time: startLocal?.split("T")[1]?.slice(0, 5) || "",
-      end_time: endLocal?.split("T")[1]?.slice(0, 5) || "",
+      title: currentData.title|| "",
+      summary: currentData.summary || "",
+      date: changedate.split("T")[0] || "",
+      start_time: currentData.start_time.slice(0,5) || "",
+      end_time: currentData.end_time.slice(0,5) || "",
     };
     setFormData(newFormData);
-  }, [currentData]);
+  }, [filterData, id]);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setErrors({ ...errors, [e.target.name]: "" });
@@ -93,8 +85,8 @@ const Update = () => {
   const customValidate = () => {
     const newErrors: Errors = {};
     let isValid: boolean = true;
-    if (!formData.name) {
-      newErrors.name = "Event name is required";
+    if (!formData.title) {
+      newErrors.title = "Event name is required";
       isValid = false;
     }
     if (!formData.summary) {
@@ -132,9 +124,6 @@ const Update = () => {
     setErrors({});
     return true;
   };
-  const changeToUtc = (date: string, time: string) => {
-    return new Date(`${date}T${time}`).toISOString().replace(".000Z", "Z");
-  };
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement>,
   ): Promise<void> => {
@@ -142,29 +131,16 @@ const Update = () => {
     const isValid: boolean = useLibrary ? zodValidate() : customValidate();
     if (!isValid) return;
     try {
-      const result = await fetch(`https://www.eventbriteapi.com/v3/events/${id}/`, {
-        method: "POST",
+      console.log(id)
+      const result = await fetch(`/api/updateevents/${id}`, {
+        method: "PUT",
         headers: {
-          Authorization: `Bearer ${API_KEY}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          event: {
-            name: {
-              html: formData.name,
-            },
-            start: {
-              timezone: "Asia/Kolkata",
-              utc: changeToUtc(formData.date, formData.start_time),
-            },
-            end: {
-              timezone: "Asia/Kolkata",
-              utc: changeToUtc(formData.date, formData.end_time),
-            },
-            summary: formData.summary,
-          },
-        }),
+        body: JSON.stringify(formData)  
       });
+      const data = await result.json()
+      console.log(data)
       if (result.ok) {
         fetchEvent();
         toast.success("Event Updated Successfully", {
@@ -172,7 +148,7 @@ const Update = () => {
         });
         navigate("/");
         setFormData({
-          name: "",
+          title: "",
           summary: "",
           date: "",
           start_time: "",
@@ -220,11 +196,11 @@ const Update = () => {
             id="outlined-basic"
             label="Event title"
             variant="outlined"
-            name="name"
-            value={formData.name}
+            name="title"
+            value={formData.title}
             onChange={handleChange}
           />
-          {errors.name && <p style={{ color: "red" }}>{errors.name}</p>}
+          {errors.title && <p style={{ color: "red" }}>{errors.title}</p>}
           <Typography variant="body1" gutterBottom>
             Update summary of an event
           </Typography>

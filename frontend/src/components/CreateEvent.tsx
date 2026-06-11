@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { NameContext } from "./Home";
 import z from "zod";
 import { toast } from "react-toastify";
-
 interface GetFormData {
   title: string;
   summary: string;
@@ -13,7 +12,6 @@ interface GetFormData {
   start_time: string;
   end_time: string;
 }
-
 interface FormErrors {
   title?: string;
   summary?: string;
@@ -21,7 +19,6 @@ interface FormErrors {
   start_time?: string;
   end_time?: string;
 }
-
 const schema = z
   .object({
     name: z.string().min(1, "Title is required"),
@@ -34,7 +31,6 @@ const schema = z
     message: "End time must be after Start time",
     path: ["end_time"],
   });
-// const API_KEY = import.meta.env.VITE_API_KEY;
 const CreateEvent = () => {
   const navigate = useNavigate();
   const context = useContext(NameContext);
@@ -93,14 +89,12 @@ const CreateEvent = () => {
     }
     setErrors(newErrors);
   };
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const updatedFormData = { ...formData, [e.target.name]: e.target.value };
     setFormData(updatedFormData);
     setErrors({ ...errors, [e.target.name]: "" });
     onChangeCheck(updatedFormData);
   };
-
   const customValidate = () => {
     const newErrors: FormErrors = {};
     let isValid: boolean = true;
@@ -130,7 +124,6 @@ const CreateEvent = () => {
     setErrors(newErrors);
     return isValid;
   };
-
   const zodValidate = () => {
     const result = schema.safeParse(formData);
     if (result.success === false) {
@@ -144,11 +137,6 @@ const CreateEvent = () => {
     setErrors({});
     return true;
   };
-
-  // const changeToUtc = (date: string, time: string) => {
-  //   return new Date(`${date}T${time}`).toISOString().replace(".000Z", "Z");
-  // };
-  console.log(formData);
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const isValid: boolean = useLibrary ? zodValidate() : customValidate();
@@ -159,7 +147,7 @@ const CreateEvent = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       });
       if (result.ok) {
         fetchEvent();
@@ -175,7 +163,6 @@ const CreateEvent = () => {
           end_time: "",
         });
       }
-      // const data = await result.json();
     } catch (error) {
       if (error instanceof Error) {
         setErr(error.message);
@@ -184,11 +171,9 @@ const CreateEvent = () => {
       }
     }
   };
-
   if (err) {
     return <h1>Server Error: ${err}</h1>;
   }
-
   return (
     <>
       <Box

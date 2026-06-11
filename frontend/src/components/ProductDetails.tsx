@@ -6,24 +6,12 @@ import { useNavigate } from "react-router-dom";
 import Loader from "./Loader";
 interface CurrentEvent {
   id: string;
-  name: {
-    text: string;
-  };
-  description: {
-    text: string;
-  };
-  start: {
-    local: string;
-    utc: string;
-    timezone: string;
-  };
-  end: {
-    local: string;
-    utc: string;
-    timezone: string;
-  };
+  title: string;
+  summary: string;
+  date: string;
+  start_time: string;
+  end_time: string;
 }
-const API_KEY: string = import.meta.env.VITE_API_KEY;
 const ProductDetails = () => {
   const { id } = useParams();
   const [result, setResult] = useState<CurrentEvent | null>(null);
@@ -33,18 +21,20 @@ const ProductDetails = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`https://www.eventbriteapi.com/v3/events/${id}/`, {
+        console.log()
+        const response = await fetch(`/api/getevents/${id}/`, {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${API_KEY}`,
             "Content-Type": "application/json",
           },
         });
+        console.log(result)
         if (!response.ok) {
           throw new Error("Network response failed...");
         }
         const data = await response.json();
-        setResult(data);
+        setResult(data[0]);
+        console.log(data)
       } catch (error) {
         if (error instanceof Error) {
           setErr(error.message);
@@ -64,10 +54,16 @@ const ProductDetails = () => {
     return <h3>Error: {err}</h3>;
   }
   if (!result) return;
-  const eventDate = new Date(result.start.local);
+  const eventDate = new Date(result.date);
   const date = eventDate.toLocaleDateString();
-  const time = eventDate.toLocaleTimeString("en-IN");
-  const endtime = new Date(result?.end?.local).toLocaleTimeString("en-IN");
+  const formatTime = (time:String)=>{
+    console.log(time.split(':'))
+    const [hours, minutes] = time.split(':')
+    const period = Number(hours)>=12 ? 'PM':'AM';
+    const hour = Number(hours)%12 || 12;
+    console.log(String(minutes).padStart(2, '0'))
+    return `${hour}:${String(minutes).padStart(2, '0')} ${period}`
+  }
   return (
     <>
       <Box
@@ -81,11 +77,11 @@ const ProductDetails = () => {
           margin: "60px",
         }}
       >
-        <h2>{result?.name?.text}</h2>
-        <p>{result?.description.text}</p>
+        <h2>{result.title}</h2>
+        <p>{result.summary}</p>
         <p>Date:- {date}</p>
-        <p>Start time:- {time}</p>
-        <p>End time:- {endtime}</p>
+        <p>Start time:- {formatTime(result.start_time)}</p>
+        <p>End time:- {formatTime(result.end_time)}</p>
         <Button
           variant="contained"
           size="large"
