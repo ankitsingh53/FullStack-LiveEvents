@@ -7,7 +7,7 @@ import z from "zod";
 import { toast } from "react-toastify";
 
 interface GetFormData {
-  name: string;
+  title: string;
   summary: string;
   date: string;
   start_time: string;
@@ -15,7 +15,7 @@ interface GetFormData {
 }
 
 interface FormErrors {
-  name?: string;
+  title?: string;
   summary?: string;
   date?: string;
   start_time?: string;
@@ -34,7 +34,7 @@ const schema = z
     message: "End time must be after Start time",
     path: ["end_time"],
   });
-const API_KEY = import.meta.env.VITE_API_KEY;
+// const API_KEY = import.meta.env.VITE_API_KEY;
 const CreateEvent = () => {
   const navigate = useNavigate();
   const context = useContext(NameContext);
@@ -42,7 +42,7 @@ const CreateEvent = () => {
   const [err, setErr] = useState<string>("");
   const [useLibrary, setUseLibrary] = useState<boolean>(false);
   const [formData, setFormData] = useState<GetFormData>({
-    name: "",
+    title: "",
     summary: "",
     date: "",
     start_time: "",
@@ -51,24 +51,24 @@ const CreateEvent = () => {
   if (!context) return;
   const { fetchEvent } = context;
   const today = new Date().toISOString().split("T")[0];
-  const onChangeCheck = (data:GetFormData) => {
-    let newErrors: FormErrors = {}
+  const onChangeCheck = (data: GetFormData) => {
+    let newErrors: FormErrors = {};
     if (data.summary.trim()) {
-      if (!data.name) {
-        newErrors.name = "This field is required";
+      if (!data.title) {
+        newErrors.title = "This field is required";
       }
     }
-     if (data.date) {
-      if (!data.name.trim()) {
-        newErrors.name = "This field is required";
+    if (data.date) {
+      if (!data.title.trim()) {
+        newErrors.title = "This field is required";
       }
       if (!data.summary.trim()) {
         newErrors.summary = "This field is required";
       }
-    } 
-     if (data.start_time) {
-      if (!data.name.trim()) {
-        newErrors.name = "This field is required";
+    }
+    if (data.start_time) {
+      if (!data.title.trim()) {
+        newErrors.title = "This field is required";
       }
       if (!data.summary.trim()) {
         newErrors.summary = "This field is required";
@@ -78,8 +78,8 @@ const CreateEvent = () => {
       }
     }
     if (data.end_time) {
-      if (!data.name.trim()) {
-        newErrors.name = "This field is required";
+      if (!data.title.trim()) {
+        newErrors.title = "This field is required";
       }
       if (!data.summary.trim()) {
         newErrors.summary = "This field is required";
@@ -104,8 +104,8 @@ const CreateEvent = () => {
   const customValidate = () => {
     const newErrors: FormErrors = {};
     let isValid: boolean = true;
-    if (!formData.name) {
-      newErrors.name = "Event name is required";
+    if (!formData.title) {
+      newErrors.title = "Event name is required";
       isValid = false;
     }
     if (!formData.summary) {
@@ -145,42 +145,22 @@ const CreateEvent = () => {
     return true;
   };
 
-  const changeToUtc = (date: string, time: string) => {
-    return new Date(`${date}T${time}`).toISOString().replace(".000Z", "Z");
-  };
-
+  // const changeToUtc = (date: string, time: string) => {
+  //   return new Date(`${date}T${time}`).toISOString().replace(".000Z", "Z");
+  // };
+  console.log(formData);
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const isValid: boolean = useLibrary ? zodValidate() : customValidate();
     if (!isValid) return;
     try {
-      const result = await fetch(
-        "https://www.eventbriteapi.com/v3/organizations/3004352223636/events/",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            event: {
-              name: {
-                html: formData.name,
-              },
-              start: {
-                timezone: "Asia/Kolkata",
-                utc: changeToUtc(formData.date, formData.start_time),
-              },
-              end: {
-                timezone: "Asia/Kolkata",
-                utc: changeToUtc(formData.date, formData.end_time),
-              },
-              currency: "USD",
-              summary: formData.summary,
-            },
-          }),
+      const result = await fetch("/api/createevents/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify(formData)
+      });
       if (result.ok) {
         fetchEvent();
         navigate("/");
@@ -188,7 +168,7 @@ const CreateEvent = () => {
           autoClose: 1000,
         });
         setFormData({
-          name: "",
+          title: "",
           summary: "",
           date: "",
           start_time: "",
@@ -239,12 +219,13 @@ const CreateEvent = () => {
             id="outlined-basic"
             label="Event title"
             variant="outlined"
-            name="name"
-            value={formData.name}
+            name="title"
+            type="text"
+            value={formData.title}
             onChange={handleChange}
             required
           />
-          {errors.name && <p style={{ color: "red" }}>{errors.name}</p>}
+          {errors.title && <p style={{ color: "red" }}>{errors.title}</p>}
           <Typography variant="body1" gutterBottom>
             Short summary of an event
           </Typography>

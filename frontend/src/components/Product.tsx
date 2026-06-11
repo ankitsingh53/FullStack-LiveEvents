@@ -10,15 +10,11 @@ import Loader from "./Loader";
 import "../App.css";
 interface ItemData {
   id: number | string;
-  name: {
-    text: string;
-  };
-  description: {
-    text: string;
-  };
+  title: string;
+  summary: string
 }
 // type GetSpecific = (pageNumber: number) => void;
-const API_KEY: string = import.meta.env.VITE_API_KEY;
+// const API_KEY: string = import.meta.env.VITE_API_KEY;
 const Product = () => {
   const context = useContext(NameContext);
   const [currentpage, SetCurrentPage] = useState(1);
@@ -36,10 +32,9 @@ const Product = () => {
   };
   const handleDelete = async (id: number) => {
     try {
-      const result = await fetch(`/api/v3/events/${id}/`, {
+      const result = await fetch(`/api/deleteevents/${id}`, {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${API_KEY}`,
           "Content-Type": "application/json",
         },
       });
@@ -89,8 +84,8 @@ const Product = () => {
               }}
             >
               <Box>
-                <h2>{item.name?.text}</h2>
-                <p>{item.description?.text}</p>
+                <h2>{item.title}</h2>
+                <p>{item.summary}</p>
               </Box>
               <Stack spacing={1}>
                 <Button

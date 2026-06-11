@@ -11,12 +11,8 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 interface Event {
   id: string;
-  name: {
-    text: string;
-  };
-  description: {
-    text: string;
-  };
+  title: string,
+  summary: string
 }
 interface ContextData {
   eventData: Event[] | null;
@@ -30,7 +26,7 @@ interface ContextData {
   filterData: Event[];
   setErr: React.Dispatch<React.SetStateAction<string>>;
 }
-const API_KEY: string = import.meta.env.VITE_API_KEY;
+// const API_KEY: string = import.meta.env.VITE_API_KEY;
 export const NameContext = createContext<ContextData | null>(null);
 const Home = () => {
   const [eventData, setEventData] = useState<Event[]>([]);
@@ -47,11 +43,10 @@ const Home = () => {
   const fetchEvent = async (): Promise<void> => {
     try {
       const result = await fetch(
-        'https://www.eventbriteapi.com/v3/organizations/3004352223636/events/',
+        'api/getevents',
         {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${API_KEY}`,
             "Content-Type": "application/json",
           },
         },
@@ -60,7 +55,8 @@ const Home = () => {
         throw new Error("Network response failed...");
       }
       const data = await result.json();
-      setEventData(data?.events);
+      console.log(data)
+      setEventData(data);
     } catch (error) {
       if (error instanceof Error) {
         setErr(error.message);
@@ -77,7 +73,7 @@ const Home = () => {
   
   }, []);
   const filterData: Event[] = eventData.filter((item) =>
-    item.name.text.toLowerCase().includes(debounceSearch.trim().toLowerCase()),
+    item.title.toLowerCase().includes(debounceSearch.trim().toLowerCase()),
   );
   return (
     <>
