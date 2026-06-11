@@ -4,52 +4,40 @@ import { pool } from "../connectDB/db.js";
 export const updateEvent = async (req, res) => {
   try {
     const id = Number(req.params.id);
-    if (!id || isNaN(id)) {
-      return res.status(400).json({
-        success: false,
-        message: "invalid event id",
-      });
-    }
     const { title, summary, date, start_time, end_time } = req.body;
     if (!title && !summary && !date && !start_time && !end_time) {
       return res.status(400).json({
-        success: "404 Bad request",
+        error: "404 Bad request",
         message: "All fields Required",
       });
     }
     if (!title.trim()) {
       return res.status(400).json({
-        success: false,
         message: "Title is required",
       });
     }
     if (!summary.trim()) {
       return res.status(400).json({
-        success: false,
         message: "Summary is required",
       });
     }
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date.trim())) {
       return res.status(400).json({
-        success: false,
         message: "Date must be in YYYY-DD-format",
       });
     }
     if (!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(start_time.trim())) {
       return res.status(400).json({
-        success: false,
         message: "Time must be in HH:MM format",
       });
     }
     if (!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(end_time.trim())) {
       return res.status(400).json({
-        success: false,
         message: "Time must be in HH:MM format",
       });
     }
     if (start_time >= end_time) {
       return res.status(400).json({
-        success: false,
         message: "End time must be greater than start time",
       });
     }
@@ -60,18 +48,16 @@ export const updateEvent = async (req, res) => {
     );
     if (data.rowCount === 0) {
       return res.status(404).json({
-        success: fase,
         message: "Event not found",
       });
     }
     return res.status(200).json({
-      success: true,
+      status: true,
       message: "Event updated successfully",
       data: data.rows[0],
     });
   } catch (error) {
     return res.status(500).json({
-      success: false,
       message: "Internal server error",
     });
   }

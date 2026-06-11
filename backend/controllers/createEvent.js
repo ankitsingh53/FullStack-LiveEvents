@@ -12,31 +12,26 @@ export const createEvent = async (req, res) => {
       !end_time.trim()
     ) {
       return res.status(400).json({
-        success: "404 Bad request",
         message: "All fields Required",
       });
     }
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
       return res.status(400).json({
-        success: false,
         message: "Date must be in YYYY-DD-format",
       });
     }
     if (!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(start_time)) {
       return res.status(400).json({
-        success: false,
         message: "Time must be in HH:MM format",
       });
     }
     if (!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(end_time)) {
       return res.status(400).json({
-        success: false,
         message: "Time must be in HH:MM format",
       });
     }
     if (start_time >= end_time) {
       return res.status(400).json({
-        success: false,
         message: "End time must be greater than start time",
       });
     }
@@ -47,7 +42,6 @@ export const createEvent = async (req, res) => {
     return res.status(201).json(data.rows[0]);
   } catch (error) {
     return res.status(500).json({
-      success: false,
       message: error.message,
     });
   }

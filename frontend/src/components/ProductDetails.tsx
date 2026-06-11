@@ -21,20 +21,17 @@ const ProductDetails = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log()
         const response = await fetch(`/api/getevents/${id}/`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
         });
-        console.log(result)
         if (!response.ok) {
           throw new Error("Network response failed...");
         }
         const data = await response.json();
         setResult(data[0]);
-        console.log(data)
       } catch (error) {
         if (error instanceof Error) {
           setErr(error.message);
@@ -47,9 +44,6 @@ const ProductDetails = () => {
     };
     fetchData();
   }, [id]);
-  if (loading) {
-    return <Loader />;
-  }
   if (err) {
     return <h3>Error: {err}</h3>;
   }
@@ -57,15 +51,14 @@ const ProductDetails = () => {
   const eventDate = new Date(result.date);
   const date = eventDate.toLocaleDateString();
   const formatTime = (time:String)=>{
-    console.log(time.split(':'))
     const [hours, minutes] = time.split(':')
     const period = Number(hours)>=12 ? 'PM':'AM';
     const hour = Number(hours)%12 || 12;
-    console.log(String(minutes).padStart(2, '0'))
     return `${hour}:${String(minutes).padStart(2, '0')} ${period}`
   }
   return (
     <>
+    {loading && <Loader/>}
       <Box
         sx={{
           padding: "30px",

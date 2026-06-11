@@ -5,6 +5,7 @@ import { deleteEvent } from '../controllers/deleteEvent.js';
 import {createEvent} from '../controllers/createEvent.js'
 import {updateEvent} from '../controllers/updateEvent.js'
 import { fetchById } from '../controllers/fetchByID.js';
+import {searchWord} from '../controllers/searchTerm.js'
  
 const router = Router()
 
@@ -18,5 +19,6 @@ router.get('/getevents/:id', fetchById)
 
 router.delete('/deleteevents/:id', deleteEvent)
 
+router.get('/search', searchWord)
 
 export {router}

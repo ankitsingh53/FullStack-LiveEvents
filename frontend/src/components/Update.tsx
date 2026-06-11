@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 import z from "zod";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Loader from "./Loader";
 interface FormType {
   title: string;
   summary: string;
@@ -37,6 +38,7 @@ const Update = () => {
   const navigate = useNavigate();
   const [err, setErr] = useState<string>("");
   const [errors, setErrors] = useState<Errors>({});
+  const [loading, setLoading] = useState<boolean>(false);
   const [useLibrary, setUseLibrary] = useState<boolean>(false);
   const [formData, setFormData] = useState<FormType>({
     title: "",
@@ -45,7 +47,6 @@ const Update = () => {
     start_time: "",
     end_time: "",
   });
-  console.log(formData)
   const { id }= useParams();
   const context = useContext(NameContext);
   if (!context) {
@@ -53,11 +54,7 @@ const Update = () => {
   }
   const { fetchEvent, filterData } = context;
   useEffect(() => {
-    console.log("useeffect ran")
-    console.log(filterData)
-    console.log(id)
     if(filterData.length ===0){
-      console.log("filterdata empty calling fetchevents")
       fetchEvent();
       return
     };
@@ -68,7 +65,6 @@ const Update = () => {
   );
     if (!currentData) return;
     const changedate = currentData.date;
-    // const endLocal = currentData?.end?.local;
     const newFormData = {
       title: currentData.title|| "",
       summary: currentData.summary || "",
@@ -130,8 +126,8 @@ const Update = () => {
     e.preventDefault();
     const isValid: boolean = useLibrary ? zodValidate() : customValidate();
     if (!isValid) return;
+    setLoading(true)
     try {
-      console.log(id)
       const result = await fetch(`/api/updateevents/${id}`, {
         method: "PUT",
         headers: {
@@ -139,8 +135,6 @@ const Update = () => {
         },
         body: JSON.stringify(formData)  
       });
-      const data = await result.json()
-      console.log(data)
       if (result.ok) {
         fetchEvent();
         toast.success("Event Updated Successfully", {
@@ -161,6 +155,8 @@ const Update = () => {
       } else {
         setErr("Something went wrong");
       }
+    } finally{
+      setLoading(false)
     }
   };
   if (err) {
@@ -168,6 +164,7 @@ const Update = () => {
   }
   return (
     <>
+    {loading&& <Loader/>}
       <Box
         component="form"
         noValidate
@@ -263,7 +260,7 @@ const Update = () => {
             color="primary"
             type="submit"
           >
-            Submit
+            Update
           </Button>
           <Button
             variant="contained"

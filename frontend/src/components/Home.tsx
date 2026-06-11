@@ -35,10 +35,16 @@ const Home = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [err, setErr] = useState<string>("");
   const [search, setSearch] = useState<string>("");
-  const [debounceSearch, setDebounceSearch] = useState<string>("");
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebounceSearch(search);
+    if(!search.trim()){
+      fetchEvent();
+      return;
+    }
+    const timer = setTimeout( async () => {
+      const data = await fetch(`/api/search?word=${search}`)
+      const result = await data.json();
+      console.log(result)
+      setEventData(result)
     }, 800);
     return () => clearTimeout(timer);
   }, [search]);
@@ -57,8 +63,8 @@ const Home = () => {
         throw new Error("Network response failed...");
       }
       const data = await result.json();
-      console.log(data)
       setEventData(data);
+      return data
     } catch (error) {
       if (error instanceof Error) {
         setErr(error.message);
@@ -72,9 +78,7 @@ const Home = () => {
   useEffect(() => {
    fetchEvent();
   }, []);
-  const filterData: Event[] = eventData.filter((item) =>
-    item.title.toLowerCase().includes(debounceSearch.trim().toLowerCase()),
-  );
+  const filterData: Event[] = eventData;   
   return (
     <>
       <NameContext.Provider

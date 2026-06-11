@@ -6,7 +6,7 @@ export const deleteEvent = async (req, res)=>{
         const id = Number(req.params.id);
         await pool.query('DELETE FROM events WHERE id=$1',[id])
         return res.status(200).json({
-            success: true,
+            status: 'ok',
             message: 'Event Deleted Successfully'
         })
     } catch (error) {

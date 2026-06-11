@@ -11,25 +11,31 @@ import "../App.css";
 interface ItemData {
   id: number | string;
   title: string;
-  summary: string
+  summary: string;
+  date: string;
+  start_time: string;
+  end_time: string;
 }
 const Product = () => {
   const context = useContext(NameContext);
-  const [currentpage, SetCurrentPage] = useState(1);
+  const [currentpage, setCurrentPage] = useState(1);
+  const [loader, setLoader] = useState(false);
   const [popUp, setpopUp] = useState<boolean>(false);
   const [deleteId, setDeleteID] = useState<number | null>();
   if (!context) return;
   const { filterData, loading, err, fetchEvent, setErr } = context;
-  const itemsPerPage = 10;
+  const itemsPerPage = 8;
   const starIndex = (currentpage - 1) * itemsPerPage;
   const endIndex = starIndex + itemsPerPage;
   const currentItems = filterData.slice(starIndex, endIndex);
   const totalPages = Math.ceil(filterData.length / itemsPerPage);
   const goToSpecificPage = (pageNumber: number) => {
-    SetCurrentPage(pageNumber);
+    setCurrentPage(pageNumber);
   };
   const handleDelete = async (id: number) => {
-    try {
+    setLoader(true)
+    setTimeout( async ()=>{
+      try {
       const result = await fetch(`/api/deleteevents/${id}`, {
         method: "DELETE",
         headers: {
@@ -37,7 +43,7 @@ const Product = () => {
         },
       });
       if (result.ok) {
-        fetchEvent();
+         fetchEvent();
         toast.success("Event Deleted Successfully", {
           autoClose: 2000,
         });
@@ -46,8 +52,18 @@ const Product = () => {
       if (error instanceof Error) {
         setErr(error.message);
       }
+    } finally {
+      setLoader(false)
     }
+    }, 1000)
   };
+  const formatTime = (time:String)=>{
+    const [hours, minutes] = time.split(':')
+    const period = Number(hours)>=12 ? 'PM':'AM';
+    const hour = Number(hours)%12 || 12;
+    return `${hour}:${String(minutes).padStart(2, '0')} ${period}`
+  }
+
   if (loading) {
     return <Loader />;
   }
@@ -56,6 +72,7 @@ const Product = () => {
   }
   return (
     <>
+    {loader && <Loader/>}
       <Box
         sx={{
           display: "flex",
@@ -71,10 +88,10 @@ const Product = () => {
             <Box
               key={item.id}
               sx={{
-                padding: "30px",
+                padding: "20px",
                 boxShadow: "0 0 10px 0",
-                width: "300px",
-                minHeight: "350px",
+                width: "320px",
+                minHeight: "400px",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
@@ -84,6 +101,16 @@ const Product = () => {
               <Box>
                 <h2>{item.title}</h2>
                 <p>{item.summary}</p>
+              </Box>
+              <Box>
+                <p>
+                  <span style={{ fontWeight: "bolder" }}>Start time:-</span>{" "}
+                  {formatTime(item.start_time)}
+                </p>
+                <p>
+                  <span style={{ fontWeight: "bolder" }}>End time:-</span>{" "}
+                  {formatTime(item.end_time)}
+                </p>
               </Box>
               <Stack spacing={1}>
                 <Button
@@ -180,7 +207,7 @@ const Product = () => {
               fontSize: "1rem",
               borderRadius: "10px",
             }}
-            onClick={() => SetCurrentPage((prev) => prev - 1)}
+            onClick={() => setCurrentPage((prev) => prev - 1)}
             disabled={currentpage === 1}
           >
             Previous
@@ -207,7 +234,7 @@ const Product = () => {
               fontSize: "1rem",
               borderRadius: "10px",
             }}
-            onClick={() => SetCurrentPage((prev) => prev + 1)}
+            onClick={() => setCurrentPage((prev) => prev + 1)}
             disabled={currentpage === totalPages}
           >
             Next

@@ -4,6 +4,7 @@ import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { NameContext } from "./Home";
 import z from "zod";
+import Loader from "./Loader";
 import { toast } from "react-toastify";
 interface GetFormData {
   title: string;
@@ -35,6 +36,7 @@ const CreateEvent = () => {
   const navigate = useNavigate();
   const context = useContext(NameContext);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [loading, setLoading] = useState<boolean>(false);
   const [err, setErr] = useState<string>("");
   const [useLibrary, setUseLibrary] = useState<boolean>(false);
   const [formData, setFormData] = useState<GetFormData>({
@@ -137,10 +139,20 @@ const CreateEvent = () => {
     setErrors({});
     return true;
   };
+  const isFormValid = ():boolean =>{
+    return (
+      formData.title.trim() !=="" &&
+      formData.summary.trim() !=="" &&
+      formData.date.trim() !=="" &&
+      formData.start_time.trim() !=="" &&
+      formData.end_time.trim() !=="" 
+    );
+  };
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const isValid: boolean = useLibrary ? zodValidate() : customValidate();
     if (!isValid) return;
+    setLoading(true)
     try {
       const result = await fetch("/api/createevents/", {
         method: "POST",
@@ -169,6 +181,8 @@ const CreateEvent = () => {
       } else {
         setErr("Something went wrong");
       }
+    } finally {
+      setLoading(false)
     }
   };
   if (err) {
@@ -176,6 +190,7 @@ const CreateEvent = () => {
   }
   return (
     <>
+    {loading&& <Loader/>}
       <Box
         component="form"
         noValidate
@@ -273,6 +288,7 @@ const CreateEvent = () => {
             size="large"
             color="primary"
             type="submit"
+            disabled={!isFormValid()}
           >
             Submit
           </Button>
