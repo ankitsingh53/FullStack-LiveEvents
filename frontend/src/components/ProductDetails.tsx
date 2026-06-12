@@ -49,11 +49,14 @@ const ProductDetails = () => {
     };
     fetchData();
   }, [id]);
+  if(loading){
+    return <Loader/>
+  }
   if (err) {
     return <h3>Error: {err}</h3>;
   }
   if (!result) return;
-  const eventDate = new Date(result.date);
+  const eventDate = new Date(result?.date);
   const date = eventDate.toLocaleDateString();
   const formatTime = (time:String)=>{
     const [hours, minutes] = time.split(':')
@@ -63,7 +66,6 @@ const ProductDetails = () => {
   }
   return (
     <>
-    {loading && <Loader/>}
       <Box
         sx={{
           padding: "30px",
@@ -75,11 +77,11 @@ const ProductDetails = () => {
           margin: "60px",
         }}
       >
-        <h2>{result.title}</h2>
-        <p>{result.summary}</p>
+        <h2>{result?.title}</h2>
+        <p>{result?.summary}</p>
         <p>Date:- {date}</p>
-        <p>Start time:- {formatTime(result.start_time)}</p>
-        <p>End time:- {formatTime(result.end_time)}</p>
+        <p>Start time:- {formatTime(result?.start_time)}</p>
+        <p>End time:- {formatTime(result?.end_time)}</p>
         <Button
           variant="contained"
           size="large"
