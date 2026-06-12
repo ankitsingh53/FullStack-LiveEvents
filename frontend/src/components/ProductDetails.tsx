@@ -1,5 +1,7 @@
 import Box from "@mui/material/Box";
 import { useEffect, useState } from "react";
+import { useContext } from "react";
+import { NameContext } from "./Home";
 import Button from "@mui/material/Button";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -13,15 +15,18 @@ interface CurrentEvent {
   end_time: string;
 }
 const ProductDetails = () => {
+  const context = useContext(NameContext);
   const { id } = useParams();
   const [result, setResult] = useState<CurrentEvent | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [err, setErr] = useState<string>("");
   const navigate = useNavigate();
+  if (!context) return;
+  const {baseUrl} = context;
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/getevents/${id}/`, {
+        const response = await fetch(`${baseUrl}/api/getevents/${id}/`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

@@ -52,7 +52,7 @@ const Update = () => {
   if (!context) {
     return;
   }
-  const { fetchEvent, filterData , eventData} = context;
+  const { fetchEvent, filterData , eventData, baseUrl} = context;
   const bookedDate = eventData?.map((event)=>event.date.split('T')[0])
   useEffect(() => {
     if(filterData.length ===0){
@@ -133,7 +133,7 @@ const Update = () => {
     if (!isValid) return;
     setLoading(true)
     try {
-      const result = await fetch(`/api/updateevents/${id}`, {
+      const result = await fetch(`${baseUrl}/api/updateevents/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

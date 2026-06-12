@@ -22,7 +22,7 @@ const Product = () => {
   const [popUp, setpopUp] = useState<boolean>(false);
   const [deleteId, setDeleteID] = useState<number | null>();
   if (!context) return;
-  const { filterData, loading, err, fetchEvent, setErr, currentpage, setCurrentPage } = context;
+  const { filterData, loading, err, fetchEvent, setErr, currentpage, setCurrentPage, baseUrl } = context;
   const itemsPerPage = 4;
   const starIndex = (currentpage - 1) * itemsPerPage;
   const endIndex = starIndex + itemsPerPage;
@@ -35,7 +35,7 @@ const Product = () => {
     setLoader(true)
     setTimeout( async ()=>{
       try {
-      const result = await fetch(`/api/deleteevents/${id}`, {
+      const result = await fetch(`${baseUrl}/api/deleteevents/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

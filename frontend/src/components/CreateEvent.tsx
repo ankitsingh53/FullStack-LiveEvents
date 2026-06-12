@@ -47,9 +47,10 @@ const CreateEvent = () => {
     end_time: "",
   });
   if (!context) return;
-  const { fetchEvent, eventData } = context;
+  const { fetchEvent, eventData, baseUrl } = context;
   const today = new Date().toISOString().split("T")[0];
   const bookedDate = eventData?.map((event)=>event.date.split('T')[0])
+  console.log(bookedDate)
   const onChangeCheck = (data: GetFormData) => {
     let newErrors: FormErrors = {};
     if (data.summary.trim()) {
@@ -159,7 +160,7 @@ const CreateEvent = () => {
     if (!isValid) return;
     setLoading(true)
     try {
-      const result = await fetch("/api/createevents/", {
+      const result = await fetch(`${baseUrl}/api/createevents/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

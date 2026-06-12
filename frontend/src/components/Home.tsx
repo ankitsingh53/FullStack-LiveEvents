@@ -29,7 +29,8 @@ interface ContextData {
   filterData: Event[];
   setErr: React.Dispatch<React.SetStateAction<string>>;
   currentpage: number;
-  setCurrentPage: React.Dispatch<React.SetStateAction<number>>
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  baseUrl: string;
 }
 export const NameContext = createContext<ContextData | null>(null);
 const Home = () => {
@@ -38,11 +39,11 @@ const Home = () => {
   const [err, setErr] = useState<string>("");
   const [currentpage, setCurrentPage] = useState<number>(1);
   const [search, setSearch] = useState<string>("");
-
+  const baseUrl = import.meta.env.VITE_API_URL
   const fetchEvent = async (): Promise<void> => {
     try {
       const result = await fetch(
-        '/api/getevents',
+        `${baseUrl}/api/getevents`,
         {
           method: "GET",
           headers: {
@@ -72,9 +73,8 @@ const Home = () => {
       return;
     }
     const timer = setTimeout( async () => {
-      const data = await fetch(`/api/search?word=${search}`)
+      const data = await fetch(`${baseUrl}/api/search?word=${search}`)
       const result = await data.json();
-      console.log(result)
       setEventData(result)
       setCurrentPage(1);
     }, 800);
@@ -99,7 +99,8 @@ const Home = () => {
           filterData,
           setErr,
           currentpage,
-          setCurrentPage
+          setCurrentPage, 
+          baseUrl
         }}
       >
         <ToastContainer />
