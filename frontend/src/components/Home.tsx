@@ -39,11 +39,10 @@ const Home = () => {
   const [err, setErr] = useState<string>("");
   const [currentpage, setCurrentPage] = useState<number>(1);
   const [search, setSearch] = useState<string>("");
-  const baseUrl = import.meta.env.VITE_API_URL
+  const baseUrl = import.meta.env.VITE_API_URL;
   const fetchEvent = async (): Promise<void> => {
     try {
-      const result = await fetch(
-        `${baseUrl}/api/getevents`,
+      const result = await fetch(`${baseUrl}/api/getevents`,
         {
           method: "GET",
           headers: {
