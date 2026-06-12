@@ -52,7 +52,8 @@ const Update = () => {
   if (!context) {
     return;
   }
-  const { fetchEvent, filterData } = context;
+  const { fetchEvent, filterData , eventData} = context;
+  const bookedDate = eventData?.map((event)=>event.date.split('T')[0])
   useEffect(() => {
     if(filterData.length ===0){
       fetchEvent();
@@ -75,6 +76,10 @@ const Update = () => {
     setFormData(newFormData);
   }, [filterData, id]);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if(e.target.name ==='date' && bookedDate?.includes(e.target.value)){
+      toast.error("This date is already booked!");
+      return;
+    }
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setErrors({ ...errors, [e.target.name]: "" });
   };

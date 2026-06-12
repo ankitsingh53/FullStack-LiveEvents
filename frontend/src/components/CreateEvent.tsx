@@ -47,8 +47,9 @@ const CreateEvent = () => {
     end_time: "",
   });
   if (!context) return;
-  const { fetchEvent } = context;
+  const { fetchEvent, eventData } = context;
   const today = new Date().toISOString().split("T")[0];
+  const bookedDate = eventData?.map((event)=>event.date.split('T')[0])
   const onChangeCheck = (data: GetFormData) => {
     let newErrors: FormErrors = {};
     if (data.summary.trim()) {
@@ -92,6 +93,10 @@ const CreateEvent = () => {
     setErrors(newErrors);
   };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if(e.target.name ==='date' && bookedDate?.includes(e.target.value)){
+      toast.error("This date is already booked!");
+      return;
+    }
     const updatedFormData = { ...formData, [e.target.name]: e.target.value };
     setFormData(updatedFormData);
     setErrors({ ...errors, [e.target.name]: "" });

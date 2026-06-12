@@ -28,26 +28,17 @@ interface ContextData {
   setSearch: React.Dispatch<React.SetStateAction<string>>;
   filterData: Event[];
   setErr: React.Dispatch<React.SetStateAction<string>>;
+  currentpage: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>
 }
 export const NameContext = createContext<ContextData | null>(null);
 const Home = () => {
   const [eventData, setEventData] = useState<Event[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [err, setErr] = useState<string>("");
+  const [currentpage, setCurrentPage] = useState<number>(1);
   const [search, setSearch] = useState<string>("");
-  useEffect(() => {
-    if(!search.trim()){
-      fetchEvent();
-      return;
-    }
-    const timer = setTimeout( async () => {
-      const data = await fetch(`/api/search?word=${search}`)
-      const result = await data.json();
-      console.log(result)
-      setEventData(result)
-    }, 800);
-    return () => clearTimeout(timer);
-  }, [search]);
+
   const fetchEvent = async (): Promise<void> => {
     try {
       const result = await fetch(
@@ -76,6 +67,20 @@ const Home = () => {
     }
   };
   useEffect(() => {
+    if(!search.trim()){
+      fetchEvent();
+      return;
+    }
+    const timer = setTimeout( async () => {
+      const data = await fetch(`/api/search?word=${search}`)
+      const result = await data.json();
+      console.log(result)
+      setEventData(result)
+      setCurrentPage(1);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [search]);
+  useEffect(() => {
    fetchEvent();
   }, []);
   const filterData: Event[] = eventData;   
@@ -93,6 +98,8 @@ const Home = () => {
           setSearch,
           filterData,
           setErr,
+          currentpage,
+          setCurrentPage
         }}
       >
         <ToastContainer />

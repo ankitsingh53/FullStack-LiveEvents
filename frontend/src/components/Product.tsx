@@ -18,13 +18,12 @@ interface ItemData {
 }
 const Product = () => {
   const context = useContext(NameContext);
-  const [currentpage, setCurrentPage] = useState(1);
   const [loader, setLoader] = useState(false);
   const [popUp, setpopUp] = useState<boolean>(false);
   const [deleteId, setDeleteID] = useState<number | null>();
   if (!context) return;
-  const { filterData, loading, err, fetchEvent, setErr } = context;
-  const itemsPerPage = 8;
+  const { filterData, loading, err, fetchEvent, setErr, currentpage, setCurrentPage } = context;
+  const itemsPerPage = 4;
   const starIndex = (currentpage - 1) * itemsPerPage;
   const endIndex = starIndex + itemsPerPage;
   const currentItems = filterData.slice(starIndex, endIndex);
