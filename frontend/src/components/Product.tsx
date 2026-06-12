@@ -55,6 +55,9 @@ const Product = () => {
       setLoader(false)
     }
     }, 1000)
+    if(currentItems.length===1){
+    setCurrentPage(1);
+  }
   };
   const formatTime = (time:String)=>{
     const [hours, minutes] = time.split(':')
